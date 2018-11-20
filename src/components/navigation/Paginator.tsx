@@ -136,7 +136,8 @@ export default class Paginator extends React.Component<
       evt.keyCode === 37 /* left */ ||
       evt.keyCode === 39 /* right */ ||
       evt.keyCode === 46 /* delete */ ||
-      evt.keyCode === 65 /* a/A */
+      ((evt.keyCode === 65 /* a/A */ || evt.keyCode === 88) /* x/X */ &&
+        evt.ctrlKey)
     ) {
       return;
     }
