@@ -70,3 +70,11 @@ interface SealedComponent {
  * @template TProps
  */
 type MakeSealed<TProps> = TProps & SealedComponent;
+
+type CommonProps = {
+  class?:string;
+  outline?: boolean;
+  round?: boolean;
+  size?: "mini" | "small" | "default" | "large";
+  style?: React.CSSProperties;
+};

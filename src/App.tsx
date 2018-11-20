@@ -1,5 +1,9 @@
-import "./assets/metroui/css/metro-all.css";
-import "./assets/styles/App.scss";
+// import "./assets/metroui/css/metro-all.css";
+import "./assets/styles/less/metro.less";
+import "./assets/styles/less/metro-rtl.less";
+import "./assets/styles/less/metro-colors.less";
+import "./assets/styles/less/metro-icons.less";
+import "./assets/styles/App.less";
 
 import * as React from "react";
 import { hot } from "react-hot-loader";
@@ -15,9 +19,11 @@ import Button, {
   ShortcutButton,
   ToolButton,
   DropdownButton,
-  SplitDropdownButton
+  SplitDropdownButton,
+  InfoButton
 } from "./components/containers/Buttons";
 import Toolbar from "./components/containers/Toolbar";
+import Paginator from "./components/navigation/Paginator";
 
 const App = () => (
   <div>
@@ -326,25 +332,76 @@ const App = () => (
 
       <DropdownButton
         text="Dropdown Button"
+        class="primary"
+        size="large"
+        menus={[
+          { text: "Reply", icon: "mif-rocket" },
+          {
+            text: "Reply All",
+            img: "https://metroui.org.ua/images/checkmark.png"
+          },
+          { text: "Forward", onClick: () => console.log("Menu clicked.") }
+        ]}
+      />
+      <SplitDropdownButton
+        text="Split Button"
+        class="success"
         size="large"
         menus={[
           { text: "Reply" },
           { text: "Reply All" },
           { text: "Forward", onClick: () => console.log("Menu clicked.") }
         ]}
-      />
-      <SplitDropdownButton
         onClick={() => console.log("Split dropdown clicked.")}
-        text="Split Button"
-        menus={[
-          { text: "Reply" },
-          { text: "Reply All" },
-          { text: "Forward", onClick: () => console.log("Menu clicked.") }
-        ]}
       />
     </fieldset>
 
-    <div style={{ height: 100 }} />
+    <fieldset>
+      <legend>Info Buttons</legend>
+
+      <InfoButton info="12334" caption="Star" icon="mif-star-full" />
+      <InfoButton
+        info="12334"
+        caption="Star"
+        icon="mif-star-full"
+        class="bg-red fg-white bd-red"
+      />
+      <InfoButton
+        info="12334"
+        caption="Star"
+        icon="mif-star-full"
+        class="success bd-green"
+        // style={{ color: "red" }}
+        round={true}
+        onClick={(info, updateInfo) => {
+          console.log(info);
+          updateInfo(`${Math.random()}`);
+        }}
+      />
+    </fieldset>
+
+    <fieldset>
+      <legend>Pagination</legend>
+
+      <Paginator
+        pageSize={50}
+        // size="large"
+        class="primary"
+        onInit={(size, update) => {
+          setTimeout(() => {
+            // get data by size
+            size;
+            update(10000);
+          }, 3000);
+        }}
+        onPaginate={(pageSize, pageIndex, finish) => {
+          console.log(pageSize, pageIndex);
+          finish(pageSize, 100);
+        }}
+      />
+    </fieldset>
+
+    <div style={{ height: 140 }} />
   </div>
 );
 

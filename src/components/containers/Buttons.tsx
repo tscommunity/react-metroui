@@ -1,13 +1,9 @@
-import "../../assets/styles/Button.scss";
+import "../../assets/styles/less/buttons.less";
 import * as React from "react";
 
-type ButtonBaseProps<TElement extends HTMLElement = HTMLButtonElement> = {
-  class?: string;
-  size?: "mini" | "small" | "default" | "large";
-  round?: boolean;
-  outline?: boolean;
-} & SupportedHTMLAttributes<TElement, "style"> &
-  SupportedReactEventHandlers<TElement, "onClick">;
+type ButtonBaseProps<
+  TElement extends HTMLElement = HTMLButtonElement
+> = CommonProps & SupportedReactEventHandlers<TElement, "onClick">;
 
 /**
  *
@@ -31,7 +27,7 @@ abstract class ButtonBase<
    * @type {string}
    * @memberof ButtonBase
    */
-  protected basicClasses?: string = "button";
+  protected basicClasses: string = "button";
 
   /**
    *
@@ -52,10 +48,10 @@ abstract class ButtonBase<
    */
   protected get rootClasses(): string {
     const classes: string[] = [];
-    this.basicClasses && classes.push(this.basicClasses);
-    this.props.size && classes.push(this.props.size!);
-    this.props.round === true && classes.push("rounded");
+    classes.push(this.basicClasses);
     this.props.outline === true && classes.push("outline");
+    this.props.round === true && classes.push("rounded");
+    this.props.size && classes.push(this.props.size!);
     this.props.class && classes.push(this.props.class!);
     return classes.join(" ");
   }
@@ -86,9 +82,9 @@ abstract class ButtonBase<
 }
 
 type ButtonProps = {
-  text?: string;
   icon?: string;
   img?: string;
+  text?: string;
 } & ButtonBaseProps;
 
 /**
@@ -110,6 +106,7 @@ export default class Button<
    * @memberof Button
    */
   protected renderChildren(): JSX.Element {
+    // "<></>" syntax from here:
     // https://github.com/facebook/react/issues/2127#issuecomment-54196748
     return (
       <>
@@ -198,7 +195,7 @@ export class CycleButton extends Button<
    * @type {string}
    * @memberof CycleButton
    */
-  protected basicClasses?: string = "button cycle";
+  protected basicClasses: string = "button cycle";
 }
 
 /**
@@ -216,7 +213,7 @@ export class ShadowButton extends Button {
    * @type {string}
    * @memberof ShadowButton
    */
-  protected basicClasses?: string = "button drop-shadow";
+  protected basicClasses: string = "button drop-shadow";
 }
 
 /**
@@ -234,7 +231,7 @@ export class FlatButton extends Button {
    * @type {string}
    * @memberof FlatButton
    */
-  protected basicClasses?: string = "button flat-button";
+  protected basicClasses: string = "button flat-button";
 }
 
 type CommandButtonProps = {
@@ -258,7 +255,7 @@ export class CommandButton extends Button<CommandButtonProps> {
    * @type {string}
    * @memberof CommandButton
    */
-  protected basicClasses?: string = "command-button";
+  protected basicClasses: string = "command-button";
 
   /**
    *
@@ -304,7 +301,7 @@ export class ImageButton extends ButtonBase<ImageButtonProps> {
    * @type {string}
    * @memberof ImageButton
    */
-  protected basicClasses?: string = "image-button";
+  protected basicClasses: string = "image-button";
 
   /**
    *Creates an instance of ImageButton.
@@ -356,7 +353,7 @@ export class ShortcutButton extends ButtonBase<ShortcutButtonProps> {
    * @type {string}
    * @memberof Shortcut
    */
-  protected basicClasses?: string = "shortcut";
+  protected basicClasses: string = "shortcut";
 
   /**
    *Creates an instance of Shortcut.
@@ -407,7 +404,7 @@ export class ToolButton extends ButtonBase<ButtonProps & SealedComponent> {
    * @type {string}
    * @memberof ToolButton
    */
-  protected basicClasses?: string = "tool-button";
+  protected basicClasses: string = "tool-button";
 
   /**
    *
@@ -435,6 +432,8 @@ type DropdownButtonProps = {
   menus: Array<
     {
       text: string;
+      icon?: string;
+      img?: string;
     } & InlineStyle &
       SupportedReactEventHandlers<HTMLAnchorElement, "onClick">
   >;
@@ -458,21 +457,50 @@ export class DropdownButton<
   protected handleClick(): void {
     if (this.state.active === false) {
       setTimeout(() => {
-        let height = this.refMenuContainer.current!.clientHeight;
+        const rect = this.refRootEle.current!.getBoundingClientRect();
+        const bottom =
+          document.documentElement!.clientHeight - rect.top - rect.height;
+        const menuHeight = this.refMenuContainer.current!.clientHeight;
 
-        console.log(
-          document.body.scrollHeight -
-            this.refRootEle.current!.getBoundingClientRect().bottom
-        );
-        this.refMenuContainer.current!.style.top = `${-height}px`;
+        // if (rect.top > bottom) {
+        //   this.refMenuContainer.current!.style.top = `${-menuHeight}px`;
+        //   return;
+        // }
 
-        console.log(height);
-        console.log(this.refMenuContainer.current!.offsetHeight);
+        if (rect.top < menuHeight) {
+          this.refMenuContainer.current!.style.top = `initial`;
+        } else {
+          if (bottom < menuHeight) {
+            this.refMenuContainer.current!.style.top = `${-menuHeight}px`;
+          } else {
+            this.refMenuContainer.current!.style.top = `initial`;
+          }
+        }
       }, 0);
       this.setState({ active: true });
     } else if (this.state.active === true) {
       this.setState({ active: false });
     }
+  }
+
+  protected renderMenuItem(
+    menu: {
+      text: string;
+      icon?: string | undefined;
+      img?: string | undefined;
+    } & InlineStyle &
+      SupportedReactEventHandlers<HTMLAnchorElement, "onClick">
+  ): React.ReactNode {
+    return (
+      <a href="javascript:void(0);" onClick={menu.onClick}>
+        {menu.icon ? (
+          <span className={"icon " + menu.icon} />
+        ) : menu.img ? (
+          <img src={menu.img} alt="" />
+        ) : null}
+        {menu.text}
+      </a>
+    );
   }
 
   render() {
@@ -481,16 +509,17 @@ export class DropdownButton<
         ref={this.refRootEle}
         className={[
           "dropdown-button",
-          this.state.active ? "active-container" : "",
-          this.props.size || ""
+          this.props.size || "",
+          this.state.active ? "active-container" : ""
         ].join(" ")}
         onClick={() => this.handleClick()}
       >
         <button
           className={[
             "button dropdown-toggle",
-            this.state.active ? "active-toggle active-control" : "",
-            this.props.size || ""
+            this.props.class || "",
+            this.props.size || "",
+            this.state.active ? "active-toggle active-control" : ""
           ].join(" ")}
         >
           {this.props.text}
@@ -504,9 +533,7 @@ export class DropdownButton<
         >
           {this.props.menus.map(menu => (
             <li style={menu.style} key={Math.random()}>
-              <a href="javascript:void(0);" onClick={menu.onClick}>
-                {menu.text}
-              </a>
+              {this.renderMenuItem(menu)}
             </li>
           ))}
         </ul>
@@ -530,13 +557,25 @@ export class SplitDropdownButton extends DropdownButton<
 > {
   render() {
     return (
-      <div ref={this.refRootEle} className="split-button">
-        <button className="button" onClick={this.props.onClick}>
+      <div
+        ref={this.refRootEle}
+        className={["split-button", this.props.size || ""].join(" ")}
+      >
+        <button
+          className={[
+            "button",
+            this.props.class || "",
+            this.props.size || ""
+          ].join(" ")}
+          onClick={this.props.onClick}
+        >
           {this.props.text}
         </button>
         <button
           className={[
-            "button dropdown-toggle",
+            "button split dropdown-toggle",
+            this.props.class || "",
+            this.props.size || "",
             this.state.active ? "active-toggle active-control" : ""
           ].join(" ")}
           onClick={() => this.handleClick()}
@@ -549,13 +588,84 @@ export class SplitDropdownButton extends DropdownButton<
           style={{ display: this.state.active ? "block" : "none" }}
         >
           {this.props.menus.map(menu => (
-            <li style={menu.style} key={Math.random()}>
-              <a href="javascript:void(0);" onClick={menu.onClick}>
-                {menu.text}
-              </a>
+            <li
+              style={menu.style}
+              key={Math.random()}
+              onClick={() => this.handleClick()}
+            >
+              {this.renderMenuItem(menu)}
             </li>
           ))}
         </ul>
+      </div>
+    );
+  }
+}
+
+type InfoButtonProps = {
+  icon?: string;
+  img?: string;
+  caption?: string;
+  info: string;
+  class?: string;
+  round?: boolean;
+  onClick?: (info: string, updateInfo: (newInfo: string) => void) => void;
+} & InlineStyle;
+
+/**
+ *
+ *
+ * @export
+ * @class InfoButton
+ * @extends {React.Component<InfoButtonProps>}
+ */
+export class InfoButton extends React.Component<
+  InfoButtonProps,
+  { info: string }
+> {
+  public get info(): string {
+    return this.state.info;
+  }
+
+  public set info(value: string) {
+    this.setState({ info: value });
+  }
+
+  constructor(props: InfoButtonProps) {
+    super(props);
+    this.state = { info: props.info };
+  }
+
+  render() {
+    return (
+      <div
+        style={this.props.style}
+        className={[
+          "info-button",
+          this.props.class || "",
+          this.props.round ? "rounded" : ""
+        ].join(" ")}
+      >
+        <a
+          href="javascript:void(0);"
+          className="button"
+          onClick={() => {
+            this.props.onClick &&
+              this.props.onClick(this.info, (value: string) => {
+                this.info = value;
+              });
+          }}
+        >
+          {this.props.icon ? (
+            <span className={this.props.icon} />
+          ) : this.props.img ? (
+            <img src={this.props.img} alt="" />
+          ) : null}
+          {this.props.caption}
+        </a>
+        <a href="javascript:void(0);" className="info">
+          {this.state.info}
+        </a>
       </div>
     );
   }
