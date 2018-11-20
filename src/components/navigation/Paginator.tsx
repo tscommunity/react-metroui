@@ -1,4 +1,3 @@
-import "../../assets/styles/less/pagination.less";
 import * as React from "react";
 
 type PaginatorProps = {

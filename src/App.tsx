@@ -1,8 +1,7 @@
-// import "./assets/metroui/css/metro-all.css";
-import "./assets/styles/less/metro.less";
-import "./assets/styles/less/metro-rtl.less";
-import "./assets/styles/less/metro-colors.less";
-import "./assets/styles/less/metro-icons.less";
+// import "./assets/styles/less/metro.less";
+// import "./assets/styles/less/metro-rtl.less";
+// import "./assets/styles/less/metro-colors.less";
+// import "./assets/styles/less/metro-icons.less";
 import "./assets/styles/App.less";
 
 import * as React from "react";

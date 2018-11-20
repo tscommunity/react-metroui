@@ -1,4 +1,3 @@
-import "../../assets/styles/less/buttons.less";
 import * as React from "react";
 
 type ButtonBaseProps<
