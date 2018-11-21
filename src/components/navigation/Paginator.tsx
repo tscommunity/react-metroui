@@ -12,11 +12,16 @@ type PaginatorProps = {
   toLastText?: string;
   gotoText?: string;
   alignment?: "left" | "center" | "right";
-  onInit: (pageSize: number, update: (total: number) => void) => void;
-  onPaginate: (
+  onInit: (pageSize: number, initedCallback: (total: number) => void) => void;
+  onPageIndexChange: (
     pageSize: number,
     pageIndex: number,
-    onFinish: (pageSize: number, total: number) => void
+    pageIndexChangedCallback: (pageSize: number, total: number) => void
+  ) => void;
+  onPageSizeChange: (
+    pageSize: number,
+    pageIndex: number,
+    pageSizeChangedCallback: (total: number, pageIndex: number) => void
   ) => void;
 } & CommonProps;
 
@@ -63,31 +68,48 @@ export default class Paginator extends React.Component<
    * @returns {string}
    * @memberof Paginator
    */
-  private getClasses(): string {
+  private get rootClasses(): string {
     const classes: string[] = ["pagination"];
     classes.push(`flex-justify-${this.props.alignment || "center"}`);
-    if (this.props.class) {
-      classes.push(this.props.class);
-    }
-    if (this.props.size) {
-      classes.push(`size-${this.props.size}`);
-    }
-    if (this.props.noGap) {
-      classes.push("no-gap");
-    }
+    this.props.size && classes.push(`size-${this.props.size}`);
+    this.props.noGap && classes.push("no-gap");
+    this.props.outline === true && classes.push("outline");
+    this.props.round === true && classes.push("rounded");
+    this.props.class && classes.push(this.props.class);
 
     return classes.join(" ");
   }
 
-  componentDidMount() {
-    this.props.onInit(this.state.pageSize, total => {
-      let totalPages = Math.ceil(total / this.state.pageSize);
-      this.setState({
-        total: total,
-        totalPages: totalPages,
-        pagesMaxLenght: totalPages.toString().length
-      });
-    });
+  /**
+   *
+   *
+   * @readonly
+   * @private
+   * @type {string}
+   * @memberof Paginator
+   */
+  private get backwardPageButtonClasses(): string {
+    const classes: string[] = ["page-item"];
+    if (this.state.pageIndex === 1) {
+      classes.push("disabled");
+    }
+    return classes.join(" ");
+  }
+
+  /**
+   *
+   *
+   * @readonly
+   * @private
+   * @type {string}
+   * @memberof Paginator
+   */
+  private get forwardPageButtonClasses(): string {
+    const classes: string[] = ["page-item"];
+    if (this.state.pageIndex === this.state.totalPages) {
+      classes.push("disabled");
+    }
+    return classes.join(" ");
   }
 
   /**
@@ -114,7 +136,7 @@ export default class Paginator extends React.Component<
    * @memberof Paginator
    */
   private handlePaginate(pageIndex: number) {
-    this.props.onPaginate(this.state.pageSize, pageIndex, (pageSize, total) => {
+    this.props.onPageIndexChange(this.state.pageSize, pageIndex, (pageSize, total) => {
       this.update(pageSize, total);
     });
   }
@@ -122,6 +144,14 @@ export default class Paginator extends React.Component<
   private gotoPage(index: number): void {
     this.setState({ pageIndex: index });
     this.handlePaginate(index);
+  }
+
+  private handlePageIndexChange(evt: React.ChangeEvent<HTMLInputElement>) {
+    const value = evt.target.value;
+    const ele = evt.target;
+    setTimeout(() => {
+      ele.value = value;
+    }, 0);
   }
 
   private handleGotoPage(evt: React.KeyboardEvent<HTMLInputElement>) {
@@ -145,68 +175,140 @@ export default class Paginator extends React.Component<
     if ((evt.keyCode !== 13 && evt.keyCode < 48) || evt.keyCode > 57) {
       evt.preventDefault();
       return;
+    }
+
+    if (evt.keyCode === 13) {
+      if (page === "") {
+        evt.preventDefault();
+        return;
+      }
+
+      // invokes the goto page event.
+      this.gotoPage(Number(page));
     } else {
-      if (evt.keyCode === 13) {
-        if (page === "") {
-          evt.stopPropagation();
+      const pos = evt.currentTarget.selectionStart;
+      page = pos! === 0 ? evt.key + page : page + evt.key;
+
+      if (/^[1-9][0-9]*$/g.test(page)) {
+        if (Number(page) > this.state.totalPages) {
           evt.preventDefault();
           return;
         }
-
-        console.log(page, "enter key pressed.");
-        this.gotoPage(Number(page));
       } else {
-        const pos = evt.currentTarget.selectionStart;
-        page = pos! === 0 ? evt.key + page : page + evt.key;
-
-        if (/^[1-9][0-9]*$/g.test(page)) {
-          if (Number(page) > this.state.totalPages) {
-            evt.preventDefault();
-            return;
-          }
-        } else {
-          evt.preventDefault();
-          return false;
-        }
+        evt.preventDefault();
+        return;
       }
     }
+  }
+
+  private gotoFirstPage() {
+    if (this.state.pageIndex > 1) {
+      this.setState(() => {
+        return { pageIndex: 1 };
+      });
+
+      this.handlePaginate(1);
+    }
+  }
+
+  private gotoPrePage() {
+    if (this.state.pageIndex > 1) {
+      this.setState(preState => {
+        const pageIndex = preState.pageIndex - 1;
+        setTimeout(() => {
+          this.handlePaginate(pageIndex);
+        }, 0);
+        return { pageIndex: pageIndex };
+      });
+    }
+  }
+
+  private gotoNextPage() {
+    if (this.state.pageIndex < this.state.totalPages) {
+      this.setState(preState => {
+        const pageIndex = preState.pageIndex + 1;
+        setTimeout(() => {
+          this.handlePaginate(pageIndex);
+        }, 0);
+        return { pageIndex: pageIndex };
+      });
+    }
+  }
+
+  private gotoLastPage() {
+    if (this.state.pageIndex < this.state.totalPages) {
+      this.setState(preState => {
+        return { pageIndex: preState.totalPages };
+      });
+
+      this.handlePaginate(this.state.totalPages);
+    }
+  }
+
+  componentDidMount() {
+    this.props.onInit(this.state.pageSize, total => {
+      const totalPages = Math.ceil(total / this.state.pageSize);
+
+      this.setState({
+        total: total,
+        totalPages: totalPages,
+        pagesMaxLenght: totalPages.toString().length
+      });
+    });
   }
 
   render() {
     if (this.props.compactMode) {
       return (
-        <ul className={this.getClasses()}>
-          <li className="page-item">
-            <a href="javascript:void(0);" className="page-link">
+        <ul className={this.rootClasses}>
+          <li className={this.backwardPageButtonClasses}>
+            <a
+              href="javascript:void(0);"
+              className="page-link"
+              onClick={() => this.gotoFirstPage()}
+            >
               {this.props.toFirstText}
             </a>
           </li>
-          <li className="page-item">
-            <a href="javascript:void(0);" className="page-link">
+          <li className={this.backwardPageButtonClasses}>
+            <a
+              href="javascript:void(0);"
+              className="page-link"
+              onClick={() => this.gotoPrePage()}
+            >
               {this.props.toPreviousText}
             </a>
           </li>
           <li className="page-box" style={{ width: "auto" }}>
-            {/* <label htmlFor="">{this.props.gotoText}</label> */}
             <input
               type="text"
               maxLength={this.state.pagesMaxLenght}
               style={{
                 width: this.state.pagesMaxLenght + 1 + "em"
               }}
+              value={this.state.pageIndex}
+              onChange={evt => this.handlePageIndexChange(evt)}
               onKeyDown={evt => this.handleGotoPage(evt)}
             />
             <span>{this.state.pageIndex}</span>
             <span>/</span>
             <span>{this.state.totalPages}</span>
           </li>
-          <li className="page-item">
-            <a href="javascript:void(0);" className="page-link">
+          <li className={this.forwardPageButtonClasses}>
+            <a
+              href="javascript:void(0);"
+              className="page-link"
+              onClick={() => this.gotoNextPage()}
+            >
               {this.props.toNextText}
             </a>
           </li>
-          <li className="page-item">
-            <a href="javascript:void(0);" className="page-link">
+          <li className={this.forwardPageButtonClasses}>
+            <a
+              href="javascript:void(0);"
+              className="page-link"
+              onClick={() => this.gotoLastPage()}
+            >
               {this.props.toLastText}
             </a>
           </li>
@@ -214,7 +316,7 @@ export default class Paginator extends React.Component<
       );
     } else {
       return (
-        <ul className={this.getClasses()}>
+        <ul className={this.rootClasses}>
           <li className="page-item">
             <a
               href="javascript:void(0);"
