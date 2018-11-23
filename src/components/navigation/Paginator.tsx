@@ -1,4 +1,6 @@
 import * as React from "react";
+import Select from "../form/Selects";
+import { stat } from "fs";
 
 type PaginatorProps = {
   size?: "small" | "large";
@@ -136,9 +138,13 @@ export default class Paginator extends React.Component<
    * @memberof Paginator
    */
   private handlePaginate(pageIndex: number) {
-    this.props.onPageIndexChange(this.state.pageSize, pageIndex, (pageSize, total) => {
-      this.update(pageSize, total);
-    });
+    this.props.onPageIndexChange(
+      this.state.pageSize,
+      pageIndex,
+      (pageSize, total) => {
+        this.update(pageSize, total);
+      }
+    );
   }
 
   private gotoPage(index: number): void {
@@ -186,14 +192,27 @@ export default class Paginator extends React.Component<
       // invokes the goto page event.
       this.gotoPage(Number(page));
     } else {
-      const pos = evt.currentTarget.selectionStart;
-      page = pos! === 0 ? evt.key + page : page + evt.key;
+      const start = evt.currentTarget.selectionStart;
+      const end = evt.currentTarget.selectionEnd;
+
+      if (end !== start) {
+        page = [page.substr(0, start!), evt.key, page.substr(end!)].join("");
+      } else {
+        page = [page.substr(0, start!), evt.key, page.substr(start!)].join("");
+      }
+
+      // page = start! === 0 ? evt.key + page : page + evt.key;
 
       if (/^[1-9][0-9]*$/g.test(page)) {
         if (Number(page) > this.state.totalPages) {
           evt.preventDefault();
           return;
         }
+
+        const target = evt.currentTarget;
+        setTimeout(() => {
+          target.value = page;
+        }, 0);
       } else {
         evt.preventDefault();
         return;
@@ -260,59 +279,67 @@ export default class Paginator extends React.Component<
   render() {
     if (this.props.compactMode) {
       return (
-        <ul className={this.rootClasses}>
-          <li className={this.backwardPageButtonClasses}>
-            <a
-              href="javascript:void(0);"
-              className="page-link"
-              onClick={() => this.gotoFirstPage()}
-            >
-              {this.props.toFirstText}
-            </a>
-          </li>
-          <li className={this.backwardPageButtonClasses}>
-            <a
-              href="javascript:void(0);"
-              className="page-link"
-              onClick={() => this.gotoPrePage()}
-            >
-              {this.props.toPreviousText}
-            </a>
-          </li>
-          <li className="page-box" style={{ width: "auto" }}>
-            <input
-              type="text"
-              maxLength={this.state.pagesMaxLenght}
-              style={{
-                width: this.state.pagesMaxLenght + 1 + "em"
-              }}
-              value={this.state.pageIndex}
-              onChange={evt => this.handlePageIndexChange(evt)}
-              onKeyDown={evt => this.handleGotoPage(evt)}
-            />
-            <span>{this.state.pageIndex}</span>
-            <span>/</span>
-            <span>{this.state.totalPages}</span>
-          </li>
-          <li className={this.forwardPageButtonClasses}>
-            <a
-              href="javascript:void(0);"
-              className="page-link"
-              onClick={() => this.gotoNextPage()}
-            >
-              {this.props.toNextText}
-            </a>
-          </li>
-          <li className={this.forwardPageButtonClasses}>
-            <a
-              href="javascript:void(0);"
-              className="page-link"
-              onClick={() => this.gotoLastPage()}
-            >
-              {this.props.toLastText}
-            </a>
-          </li>
-        </ul>
+        <>
+          <Select
+            options={this.props.pageSizeList!.map(item => {
+              return { text: item.toString(), value: item.toString() };
+            })}
+            filterable={true}
+          />
+          <ul className={this.rootClasses}>
+            <li className={this.backwardPageButtonClasses}>
+              <a
+                href="javascript:void(0);"
+                className="page-link"
+                onClick={() => this.gotoFirstPage()}
+              >
+                {this.props.toFirstText}
+              </a>
+            </li>
+            <li className={this.backwardPageButtonClasses}>
+              <a
+                href="javascript:void(0);"
+                className="page-link"
+                onClick={() => this.gotoPrePage()}
+              >
+                {this.props.toPreviousText}
+              </a>
+            </li>
+            <li className="page-box" style={{ width: "auto" }}>
+              <input
+                type="text"
+                maxLength={this.state.pagesMaxLenght}
+                style={{
+                  width: this.state.pagesMaxLenght + 1 + "em"
+                }}
+                value={this.state.pageIndex}
+                onChange={evt => this.handlePageIndexChange(evt)}
+                onKeyDown={evt => this.handleGotoPage(evt)}
+              />
+              <span>{this.state.pageIndex}</span>
+              <span>/</span>
+              <span>{this.state.totalPages}</span>
+            </li>
+            <li className={this.forwardPageButtonClasses}>
+              <a
+                href="javascript:void(0);"
+                className="page-link"
+                onClick={() => this.gotoNextPage()}
+              >
+                {this.props.toNextText}
+              </a>
+            </li>
+            <li className={this.forwardPageButtonClasses}>
+              <a
+                href="javascript:void(0);"
+                className="page-link"
+                onClick={() => this.gotoLastPage()}
+              >
+                {this.props.toLastText}
+              </a>
+            </li>
+          </ul>
+        </>
       );
     } else {
       return (
