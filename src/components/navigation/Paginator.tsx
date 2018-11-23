@@ -1,6 +1,5 @@
 import * as React from "react";
 import Select from "../form/Selects";
-import { stat } from "fs";
 
 type PaginatorProps = {
   size?: "small" | "large";
