@@ -189,7 +189,7 @@ export default class Paginator extends React.Component<
         return;
       }
 
-      // invokes the goto page event.
+      // invokes the goto page method.
       this.gotoPage(Number(page));
     } else {
       const start = evt.currentTarget.selectionStart;
@@ -200,8 +200,6 @@ export default class Paginator extends React.Component<
       } else {
         page = [page.substr(0, start!), evt.key, page.substr(start!)].join("");
       }
-
-      // page = start! === 0 ? evt.key + page : page + evt.key;
 
       if (/^[1-9][0-9]*$/g.test(page)) {
         if (Number(page) > this.state.totalPages) {
