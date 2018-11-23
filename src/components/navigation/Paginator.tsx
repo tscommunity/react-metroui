@@ -285,20 +285,12 @@ export default class Paginator extends React.Component<
           />
           <ul className={this.rootClasses}>
             <li className={this.backwardPageButtonClasses}>
-              <a
-                href="javascript:void(0);"
-                className="page-link"
-                onClick={() => this.gotoFirstPage()}
-              >
+              <a className="page-link" onClick={() => this.gotoFirstPage()}>
                 {this.props.toFirstText}
               </a>
             </li>
             <li className={this.backwardPageButtonClasses}>
-              <a
-                href="javascript:void(0);"
-                className="page-link"
-                onClick={() => this.gotoPrePage()}
-              >
+              <a className="page-link" onClick={() => this.gotoPrePage()}>
                 {this.props.toPreviousText}
               </a>
             </li>
@@ -318,20 +310,12 @@ export default class Paginator extends React.Component<
               <span>{this.state.totalPages}</span>
             </li>
             <li className={this.forwardPageButtonClasses}>
-              <a
-                href="javascript:void(0);"
-                className="page-link"
-                onClick={() => this.gotoNextPage()}
-              >
+              <a className="page-link" onClick={() => this.gotoNextPage()}>
                 {this.props.toNextText}
               </a>
             </li>
             <li className={this.forwardPageButtonClasses}>
-              <a
-                href="javascript:void(0);"
-                className="page-link"
-                onClick={() => this.gotoLastPage()}
-              >
+              <a className="page-link" onClick={() => this.gotoLastPage()}>
                 {this.props.toLastText}
               </a>
             </li>
@@ -343,7 +327,6 @@ export default class Paginator extends React.Component<
         <ul className={this.rootClasses}>
           <li className="page-item">
             <a
-              href="javascript:void(0);"
               className="page-link"
               onClick={() => {
                 this.handlePaginate(1);
@@ -353,29 +336,19 @@ export default class Paginator extends React.Component<
             </a>
           </li>
           <li className="page-item">
-            <a href="javascript:void(0);" className="page-link">
-              2
-            </a>
+            <a className="page-link">2</a>
           </li>
           <li className="page-item">
-            <a href="javascript:void(0);" className="page-link">
-              3
-            </a>
+            <a className="page-link">3</a>
           </li>
           <li className="page-item">
-            <a href="javascript:void(0);" className="page-link">
-              4
-            </a>
+            <a className="page-link">4</a>
           </li>
           <li className="page-item">
-            <a href="javascript:void(0);" className="page-link">
-              5
-            </a>
+            <a className="page-link">5</a>
           </li>
           <li className="page-item">
-            <a href="javascript:void(0);" className="page-link">
-              6
-            </a>
+            <a className="page-link">6</a>
           </li>
         </ul>
       );
