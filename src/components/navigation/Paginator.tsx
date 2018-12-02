@@ -273,85 +273,104 @@ export default class Paginator extends React.Component<
     });
   }
 
-  render() {
-    if (this.props.compactMode) {
-      return (
-        <>
-          <Select
-            options={this.props.pageSizeList!.map(item => {
-              return { text: item.toString(), value: item.toString() };
-            })}
-            filterable={true}
-          />
-          <ul className={this.rootClasses}>
-            <li className={this.backwardPageButtonClasses}>
-              <a className="page-link" onClick={() => this.gotoFirstPage()}>
-                {this.props.toFirstText}
-              </a>
-            </li>
-            <li className={this.backwardPageButtonClasses}>
-              <a className="page-link" onClick={() => this.gotoPrePage()}>
-                {this.props.toPreviousText}
-              </a>
-            </li>
-            <li className="page-box" style={{ width: "auto" }}>
-              <input
-                type="text"
-                maxLength={this.state.pagesMaxLenght}
-                style={{
-                  width: this.state.pagesMaxLenght + 1 + "em"
-                }}
-                value={this.state.pageIndex}
-                onChange={evt => this.handlePageIndexChange(evt)}
-                onKeyDown={evt => this.handleGotoPage(evt)}
-              />
-              <span>{this.state.pageIndex}</span>
-              <span>/</span>
-              <span>{this.state.totalPages}</span>
-            </li>
-            <li className={this.forwardPageButtonClasses}>
-              <a className="page-link" onClick={() => this.gotoNextPage()}>
-                {this.props.toNextText}
-              </a>
-            </li>
-            <li className={this.forwardPageButtonClasses}>
-              <a className="page-link" onClick={() => this.gotoLastPage()}>
-                {this.props.toLastText}
-              </a>
-            </li>
-          </ul>
-        </>
-      );
-    } else {
-      return (
+  private renderCompactPaginator() {
+    return (
+      <>
         <ul className={this.rootClasses}>
-          <li className="page-item">
-            <a
-              className="page-link"
-              onClick={() => {
-                this.handlePaginate(1);
-              }}
-            >
-              1
+          <li className={this.backwardPageButtonClasses}>
+            <a className="page-link" onClick={() => this.gotoFirstPage()}>
+              {this.props.toFirstText}
             </a>
           </li>
-          <li className="page-item">
-            <a className="page-link">2</a>
+          <li className={this.backwardPageButtonClasses}>
+            <a className="page-link" onClick={() => this.gotoPrePage()}>
+              {this.props.toPreviousText}
+            </a>
           </li>
-          <li className="page-item">
-            <a className="page-link">3</a>
+          <li>
+            <Select
+              options={this.props.pageSizeList!.map(item => {
+                return {
+                  text: item.toString(),
+                  value: item.toString(),
+                  icon: "mif-checkmark"
+                };
+              })}
+              filterable={false}
+              style={{
+                width: "4rem",
+                height: "34px",
+                display: "inline-block",
+                margin: "0",
+                bottom: "-4px"
+              }}
+            />
           </li>
-          <li className="page-item">
-            <a className="page-link">4</a>
+          <li className="page-box" style={{ width: "auto" }}>
+            <input
+              type="text"
+              maxLength={this.state.pagesMaxLenght}
+              style={{
+                width: this.state.pagesMaxLenght + 1 + "em"
+              }}
+              value={this.state.pageIndex}
+              onChange={evt => this.handlePageIndexChange(evt)}
+              onKeyDown={evt => this.handleGotoPage(evt)}
+            />
+            <span>{this.state.pageIndex}</span>
+            <span style={{ padding: "0 3px" }}>/</span>
+            <span>{this.state.totalPages}</span>
           </li>
-          <li className="page-item">
-            <a className="page-link">5</a>
+          <li className={this.forwardPageButtonClasses}>
+            <a className="page-link" onClick={() => this.gotoNextPage()}>
+              {this.props.toNextText}
+            </a>
           </li>
-          <li className="page-item">
-            <a className="page-link">6</a>
+          <li className={this.forwardPageButtonClasses}>
+            <a className="page-link" onClick={() => this.gotoLastPage()}>
+              {this.props.toLastText}
+            </a>
           </li>
         </ul>
-      );
-    }
+      </>
+    );
+  }
+
+  private renderPaginator(): JSX.Element {
+    return (
+      <ul className={this.rootClasses}>
+        <li className="page-item">
+          <a
+            className="page-link"
+            onClick={() => {
+              this.handlePaginate(1);
+            }}
+          >
+            1
+          </a>
+        </li>
+        <li className="page-item">
+          <a className="page-link">2</a>
+        </li>
+        <li className="page-item">
+          <a className="page-link">3</a>
+        </li>
+        <li className="page-item">
+          <a className="page-link">4</a>
+        </li>
+        <li className="page-item">
+          <a className="page-link">5</a>
+        </li>
+        <li className="page-item">
+          <a className="page-link">6</a>
+        </li>
+      </ul>
+    );
+  }
+
+  render() {
+    return this.props.compactMode
+      ? this.renderCompactPaginator()
+      : this.renderPaginator();
   }
 }
