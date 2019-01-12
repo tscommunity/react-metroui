@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "webpack-dev-server --hot --port 80",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs": "vuepress dev docs",
+    "docs:build": "vuepress build docs && cp -rf ./docs/.vuepress/dist/* ./docs && rm -r ./docs/.vuepress/dist"
   },
   "author": "tscommunity@hotmail.com",
   "license": "MIT",
@@ -45,6 +47,7 @@
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "typescript": "^3.1.6",
+    "vuepress": "^0.14.8",
     "webpack": "^4.25.1",
     "webpack-cli": "^3.1.2",
     "webpack-dev-server": "^3.1.10"

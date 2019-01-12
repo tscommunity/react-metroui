@@ -1,0 +1,25 @@
+{
+    "recommendations": [
+        // [Document This] - Automatically generates detailed JSDoc comments in TypeScript and JavaScript files.
+        "joelday.docthis",
+        // [Prettier - Code formatter] - Format your JavaScript / TypeScript / CSS files.
+        "esbenp.prettier-vscode",
+        // [Rainbow Brackets] - Provide rainbow colors for the round brackets, the square brackets and the squiggly brackets. The isolated right bracket will be highlighted in red.
+        "2gua.rainbow-brackets",
+        // [EditorConfig for VS Code] - Override user/workspace settings with settings found in .editorconfig files.
+        "editorconfig.editorconfig",
+        // [TSLint] - Integrates the tslint linter for the TypeScript language.
+        "eg2.tslint",
+        // [TypeLens] - Shows references to TypeScript methods in the form of codelens.
+        "kisstkondoros.typelens",
+        // [Git History] - View git log, file history, compare branches or commits.
+        "donjayamanne.githistory",
+        // [GitLens — Git supercharged] - Supercharge the Git capabilities built into Visual Studio Code — Visualize code authorship at a glance via Git blame annotations and code lens, seamlessly navigate and explore Git repositories, gain valuable insights via powerful comparison commands, and so much more.
+        "eamodio.gitlens",
+        // [YAML] - YAML Language Support by Red Hat, with built-in Kubernetes and Kedge syntax support.
+				"redhat.vscode-yaml",
+				// [Travis CI Status] - Check your project's Travis CI status from Visual Studio Code.
+				"felixrieseberg.vsc-travis-ci-status"
+    ],
+    "unwantedRecommendations": []
+}
