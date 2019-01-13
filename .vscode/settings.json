@@ -1,0 +1,5 @@
+{
+	"travis.repository": "react-metroui",
+	"travis.username": "tscommunity",
+	"travis.statusPollingInterval": 60
+}

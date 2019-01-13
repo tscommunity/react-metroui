@@ -1,0 +1,8 @@
+{
+	"rules": {
+		"interface-name": true,
+		"class-name": true,
+		"jsdoc-format": true,
+		"completed-docs": true
+	}
+}
